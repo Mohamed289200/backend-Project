@@ -48,6 +48,10 @@ const userSchema = mongoose.Schema(
 			require: [true, "Role is required"],
 			enum: ["user", "patient", "doctor", "nurse", "hospital"],
 		},
+		specialization: {
+			type: String,
+			maxLength: [40, "Specialization MUST NOT exceed 20 numbers,got {VALUE}"],
+		},
 	},
 	{
 		timestamps: true,
