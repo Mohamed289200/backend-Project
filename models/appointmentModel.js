@@ -2,15 +2,15 @@ const mongoose = require("mongoose");
 
 const appointmentSchema = mongoose.Schema(
 	{
-		patient_id: {
+		patientId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: User,
 		},
-		nurse_id: {
+		nurseId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: User,
 		},
-		doctor_id: {
+		doctorId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: User,
 		},
@@ -19,7 +19,7 @@ const appointmentSchema = mongoose.Schema(
 			require: [true, "You Must define priority for this appointment"],
 			enum: ["critical", "important", "moderate", "low"],
 		},
-		appiontment_date: {
+		appiontmentDate: {
 			type: Date,
 			require: [true, "This appointment MUST have a date"],
 		},
