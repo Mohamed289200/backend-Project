@@ -9,7 +9,7 @@ const diseaseSchema = mongoose.Schema(
 		description: {
 			type: String,
 			require: [true, "This Diseases MUST have a description"],
-			maxLength: [400, "Description MUSTn't exceed 400 characters"],
+			maxLength: [400, "Description MUST NOT exceed 400 characters"],
 		},
 		rank: {
 			type: String,
