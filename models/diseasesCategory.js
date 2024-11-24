@@ -26,4 +26,4 @@ const diseasesCategorySchema = mongoose.Schema(
 	}
 );
 
-module.exports = mongoose.model("DiseasesCategory", diseasesCategorySchema);
+export default mongoose.model("DiseasesCategory", diseasesCategorySchema);

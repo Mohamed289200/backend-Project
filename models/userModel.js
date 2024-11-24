@@ -4,49 +4,44 @@ const userSchema = mongoose.Schema(
 		name: {
 			type: String,
 			required: [true, "Username is required"],
-			maxLength: [50, "Username MUST NOT exceed 50 characters, got {VALUE}"],
+			maxLength: [50, "Username MUST NOT exceed 50 characters"],
 		},
 		gender: {
 			type: String,
 			required: [true, "Gender is required"],
-			enum: ["male", "female", "else", null],
+			enum: ["male", "female", "else"],
 		},
 		email: {
 			type: String,
 			required: [true, "Email is required"],
 			unique: [true, "This email already exists"],
-			minLength: [
-				10,
-				"Email size MUST be more than 10 characters, got {VALUE}",
-			],
-			maxLength: [
-				150,
-				"Email size MUST NOT exceed 150 characters, got {VALUE}",
-			],
+			minLength: [10, "Email size MUST be more than 10 characters"],
+			maxLength: [150, "Email size MUST NOT exceed 150 characters"],
 			trim: true,
+			match: [
+				/^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+				"Please enter a valid email address",
+			],
 		},
 		password: {
 			type: String,
 			required: [true, "Password is required"],
-			minLength: [8, "Password MUST be more than 8 characters, got {VALUE}"], // Regex
+			minLength: [8, "Password MUST be more than 8 characters"], // Regex
 		},
 		phone: {
 			type: String,
 			required: [true, "Phone number is required"],
-			maxLength: [
-				20,
-				"Phone number MUST NOT exceed 20 characters, got {VALUE}",
-			],
+			maxLength: [20, "Phone number MUST NOT exceed 20 characters"],
 		},
 		city: {
 			type: String,
 			required: [true, "City is required"],
-			maxLength: [30, "City MUST NOT exceed 30 characters, got {VALUE}"],
+			maxLength: [30, "City MUST NOT exceed 30 characters"],
 		},
 		country: {
 			type: String,
 			required: [true, "Country is required"],
-			maxLength: [30, "Country MUST NOT exceed 30 characters, got {VALUE}"],
+			maxLength: [30, "Country MUST NOT exceed 30 characters"],
 		},
 		role: {
 			type: String,
@@ -55,10 +50,7 @@ const userSchema = mongoose.Schema(
 		},
 		specialization: {
 			type: String,
-			maxLength: [
-				40,
-				"Specialization MUST NOT exceed 40 characters, got {VALUE}",
-			],
+			maxLength: [40, "Specialization MUST NOT exceed 40 characters"],
 		},
 	},
 	{
@@ -66,4 +58,4 @@ const userSchema = mongoose.Schema(
 	}
 );
 
-module.exports = mongoose.model("User", userSchema);
+export default mongoose.model("User", userSchema);

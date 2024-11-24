@@ -29,7 +29,6 @@ const appointmentSchema = mongoose.Schema(
 		status: {
 			type: String,
 			enum: ["finished", "ongoing", "queued"],
-			default: "queued", // Default value added
 		},
 	},
 	{
@@ -37,4 +36,4 @@ const appointmentSchema = mongoose.Schema(
 	}
 );
 
-module.exports = mongoose.model("Appointment", appointmentSchema);
+export default mongoose.model("Appointment", appointmentSchema);

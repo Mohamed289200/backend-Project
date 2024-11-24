@@ -22,4 +22,4 @@ const diseaseSchema = mongoose.Schema(
 	}
 );
 
-module.exports = mongoose.model("Diseases", diseaseSchema);
+export default mongoose.model("Diseases", diseaseSchema);

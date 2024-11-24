@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const adviceSchema = mongoose.Schema(
 	{
-		doctorID: {
+		doctorId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Doctor",
 			required: [true, "Doctor ID is required"],
@@ -23,4 +23,4 @@ const adviceSchema = mongoose.Schema(
 	}
 );
 
-module.exports = mongoose.model("Advice", adviceSchema);
+export default mongoose.model("Advice", adviceSchema);
