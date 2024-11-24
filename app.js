@@ -33,4 +33,7 @@ mongoose
 			console.log("database is connected ✅");
 			console.log("server is running ✅");
 		});
+	})
+	.catch((error) => {
+		console.log("Connection Failed" + " >>  " + error);
 	});
