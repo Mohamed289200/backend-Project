@@ -1,17 +1,20 @@
 const mongoose = require("mongoose");
+
 const adviceSchema = mongoose.Schema(
 	{
 		doctorID: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Doctor",
+			required: [true, "Doctor ID is required"],
 		},
 		diseasesCategoryId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "DiseasesCategory",
+			required: [true, "Diseases Category ID is required"],
 		},
 		description: {
 			type: String,
-			require: [true, "This Advice MUST have a description"],
+			required: [true, "This Advice MUST have a description"],
 			maxLength: [400, "Description MUST NOT exceed 400 characters"],
 		},
 	},
