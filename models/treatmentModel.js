@@ -5,15 +5,16 @@ const treatmentSchema = mongoose.Schema(
 		diseaseID: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Diseases",
+			required: [true, "A Treatment must be associated with a Disease ID"],
 		},
 		name: {
 			type: String,
-			require: [true, "This Treatment MUST have a name"],
+			required: [true, "This Treatment MUST have a name"],
 		},
 		description: {
 			type: String,
-			require: [true, "This Treatment MUST have a description"],
-			maxLength: [500, "Description MUST NOT exceed 400 characters"],
+			required: [true, "This Treatment MUST have a description"],
+			maxLength: [500, "Description MUST NOT exceed 500 characters"],
 		},
 	},
 	{
