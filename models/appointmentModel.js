@@ -4,19 +4,19 @@ const appointmentSchema = mongoose.Schema(
 	{
 		patientId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: User,
+			ref: "User",
 		},
 		nurseId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: User,
+			ref: "User",
 		},
 		doctorId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: User,
+			ref: "User",
 		},
 		priority: {
 			type: String,
-			require: [true, "You Must define priority for this appointment"],
+			require: [true, "You MUST define priority for this appointment"],
 			enum: ["critical", "important", "moderate", "low"],
 		},
 		appiontmentDate: {
