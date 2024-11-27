@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import userRouter from './routes/user.js';
 // import User from "./models/userModel.js";
 // import Treatment from "./models/treatmentModel.js";
 // import Diseases from "./models/diseasesModel.js";
@@ -12,12 +13,13 @@ dotenv.config();
 
 // starting the server
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //APIs goes here
-
+app.use('/', userRouter);
 // app.post("/test", async (req, res) => {
 // 	const { doctorId, patientId, nurseId, priority, appointmentDate, status } =
 // 		req.body;
