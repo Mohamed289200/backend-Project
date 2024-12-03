@@ -47,7 +47,7 @@ const userSchema = mongoose.Schema(
 		role: {
 			type: String,
 			required: [true, "Role is required"],
-			enum: ["user", "patient", "doctor", "nurse", "hospital"],
+			enum: ["admin", "user", "patient", "doctor", "nurse", "hospital"],
 		},
 		specialization: {
 			type: String,
@@ -59,6 +59,6 @@ const userSchema = mongoose.Schema(
 	}
 );
 userSchema.methods.comparePassword = async function (password) {
-    return bcrypt.compare(password, this.password);
+	return bcrypt.compare(password, this.password);
 };
 export default mongoose.model("User", userSchema);
