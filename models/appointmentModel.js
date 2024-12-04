@@ -10,12 +10,12 @@ const appointmentSchema = mongoose.Schema(
 		nurseId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
-			required: [true, "Nurse ID is required"],
+			//required: [true, "Nurse ID is required"],
 		},
 		doctorId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
-			required: [true, "Doctor ID is required"],
+			//required: [true, "Doctor ID is required"],
 		},
 		priority: {
 			type: String,
