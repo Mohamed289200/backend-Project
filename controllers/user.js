@@ -83,7 +83,6 @@ export const sendOTP = async (req, res) => {
 			});
 		}
 		const OTP = generateOTP();
-		console.log(OTP);
 
 		await sendEmail(email, "Your OTP", OTP);
 
@@ -91,6 +90,39 @@ export const sendOTP = async (req, res) => {
 			success: true,
 			message: "OTP has been sent",
 			data: OTP,
+		});
+	} catch (error) {
+		console.log(error);
+
+		return res.status(500).json({
+			success: false,
+			message: "internal server error",
+			data: `${error}`,
+		});
+	}
+};
+
+export const resetPassword = async (req, res) => {
+	const email = req.body?.email;
+	const password = req.body?.password;
+	if (email == null || password == null) {
+		return res.status(403).json({
+			success: false,
+			message: "please provide all required data",
+			data: null,
+		});
+	}
+	try {
+		const hashedPassword = await bcrypt.hash(password, 10);
+		const user = await userModel.findOneAndUpdate(
+			{ email },
+			{ password: hashedPassword },
+			{ new: true }
+		);
+		return res.status(200).json({
+			success: true,
+			message: "user password has been updated",
+			date: user,
 		});
 	} catch (error) {
 		console.log(error);
