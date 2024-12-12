@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import userModel from "../models/userModel.js"; // Ensure the path and extension are correct
 import jwt from "jsonwebtoken";
-
+import generateOTP from "../helpers/generateOTP.js";
+import sendEmail from "../Mail/mailingService.js";
 export const register = async (req, res) => {
 	try {
 		const existingUser = await userModel.findOne({ email: req.body.email }); // Ensure you use req.body.email
@@ -61,5 +62,43 @@ export const login = async (req, res) => {
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "An error occurred while logging in" });
+	}
+};
+export const sendOTP = async (req, res) => {
+	const email = req.body?.email;
+	if (email == null) {
+		return res.status(403).json({
+			success: false,
+			message: "please provide an email",
+			data: null,
+		});
+	}
+	try {
+		const user = await userModel.findOne({ email });
+		if (user == null) {
+			return res.status(404).json({
+				success: false,
+				message: "your email doesn't exist in the database",
+				data: null,
+			});
+		}
+		const OTP = generateOTP();
+		console.log(OTP);
+
+		await sendEmail(email, "Your OTP", OTP);
+
+		return res.status(201).json({
+			success: true,
+			message: "OTP has been sent",
+			data: OTP,
+		});
+	} catch (error) {
+		console.log(error);
+
+		return res.status(500).json({
+			success: false,
+			message: "internal server error",
+			data: `${error}`,
+		});
 	}
 };
