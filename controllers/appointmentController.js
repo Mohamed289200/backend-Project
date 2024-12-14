@@ -1,18 +1,31 @@
 import user from '../models/userModel.js';
 import appointmentModel from '../models/appointmentModel.js'
 export const booking = async (req, res) => {
-   
+
     try {
-        const patientId = req.user._id; 
-        const doctorId = req.body.doctorId;
-        // const doctorId = req.params.id; 
+
+        const patientId = req.user._id;
+        // const doctorId = req.body.doctorId;
+        const doctorId = req.params.id;
         const role = req.user.role;
+        const doctor = await user.findById(doctorId)
+        if (!doctor) {
+            console.error(`doctor not found with id ${doctorId}`)
+            return res.status(404).json({ success: false, message: "Tour not found" })
+
+        }
         if (role !== "admin" && role !== "hospital") {
-           
-            const {  nurseId, priority, appointmentDate } = req.body;
-            const newAppoint = new appointmentModel({patientId, nurseId, doctorId, priority, appointmentDate});
-            const savedAppointment = await newAppoint.save();
-   res.status(200).json({ message: "Appointment booked successfully", appointment: savedAppointment });
+
+            const { nurseId, priority, appointmentDate } = req.body;
+            const appoint = new appointmentModel({ patientId, nurseId, doctorId, priority, appointmentDate });
+            const savedAppointment = await appoint.save();
+            res.status(200).json({ message: "Appointment booked successfully", appointment: savedAppointment });
+
+            await doctor.updateOne({
+                $push: { appoints: appoint._id }
+            })
+
+
         } else {
             res.status(403).send("Access Denied");
         }
@@ -21,38 +34,71 @@ export const booking = async (req, res) => {
         res.status(400).send({ message: "An error occurred while booking the appointment", error: error.message });
     }
 };
-export const deleteAppoint = async (req,res)=>{
+export const deleteAppoint = async (req, res) => {
     const role = req.user.role;
     if (role == "admin" || role == "patient") {
-    try {
-       
-        await appointmentModel.findByIdAndDelete(req.params.id)
-        res.json({ message: "book deleted", data: [] })
+        try {
+
+            await appointmentModel.findByIdAndDelete(req.params.id)
+            res.json({ message: "book deleted", data: [] })
         }
-    catch (error) {
-        console.error("Error deleting appointment:", error);
-        res.status(500).json({ message: "An error occurred while deleting the appointment", error: error.message });
-    }}
+        catch (error) {
+            console.error("Error deleting appointment:", error);
+            res.status(500).json({ message: "An error occurred while deleting the appointment", error: error.message });
+        }
+    }
     else {
         res.status(403).json({ message: "You do not have permission to delete this appointment" });
     }
 }
-export const updateappointment = async (req,res)=>{
+export const updateappointment = async (req, res) => {
     const role = req.user.role
-   if(role == "patient"){
-    try {
-        const appointmentId= req.params.id
-        const newAppointment = req.body
-         await appointmentModel.findByIdAndUpdate(appointmentId, newAppointment)
-        res.json({ message: "book update", data:newAppointment})}
-        
-    catch (error) {
-        console.error("Error updating appointment:", error);
-        res.status(500).json({ message: "An error occurred while updating the appointment", error: error.message });
-  
-   }}
-   else{
+    if (role == "patient") {
+        try {
+            const appointmentId = req.params.id
+            const newAppointment = req.body
+            await appointmentModel.findByIdAndUpdate(appointmentId, newAppointment)
+            res.json({ message: "book update", data: newAppointment })
+        }
+
+        catch (error) {
+            console.error("Error updating appointment:", error);
+            res.status(500).json({ message: "An error occurred while updating the appointment", error: error.message });
+
+        }
+    }
+    else {
         res.status(403).send("Access Denied")
     }
-   
+
+}
+export const getAllAppointment = async (req, res) => {
+    const role = req.user.role
+    if (role == "nurse" || role == "doctor") {
+        try {
+
+            const appointments = await appointmentModel.find()
+            res.json({ message: "Appointments", data: appointments })
+        }
+
+        catch (error) {
+            console.error("Error updating appointment:", error);
+            res.status(500).json({ message: "An error occurred while updating the appointment", error: error.message });
+
+        }
+    }
+    else {
+        res.status(403).send("Access Denied")
+    }
+
+}
+export const getAppointment = async (req, res) => {
+    const id = req.params.id
+    try {
+        const booking = await appointmentModel.findById(id)
+        res.status(200).json({ message: " successful", data: booking })
+    } catch (error) {
+        res.status(400).json({ success: false, message: "deketed failed" })
+
+    }
 }
