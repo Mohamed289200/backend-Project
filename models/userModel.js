@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import appointmentSchema from "./appointmentModel.js"
 const userSchema = mongoose.Schema(
 	{
 		name: {
@@ -53,6 +54,15 @@ const userSchema = mongoose.Schema(
 			type: String,
 			maxLength: [40, "Specialization MUST NOT exceed 40 characters"],
 		},
+		appointments: [// appointmentSchema
+			  {
+			   type: mongoose.Types.ObjectId,
+			   ref: 'Appointment',
+			 },/*  {
+		   name: String,
+		   rating: Number,
+		 },*/
+		   ],
 	},
 	{
 		timestamps: true,

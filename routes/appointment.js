@@ -3,10 +3,10 @@ import { booking,getAppointment , deleteAppoint,updateappointment,getAllAppointm
 import authintication from "../middlewares/auth.js"; 
 const router = express.Router();
 
-router.delete('/api/delete', authintication, deleteAppoint);
+router.delete('/api/appointments/:id', authintication, deleteAppoint);
 router.post('/api/doctors/:id/book', authintication, booking);
-router.put('/api/update', authintication, updateappointment);
+router.put('/api/appointments/:id', authintication, updateappointment);
 router.get('/api/appointments', authintication, getAllAppointment);
-router.get('/api/appointment', authintication, getAppointment);
+router.get('/api/appointments/:id', authintication, getAppointment);
 
 export default router;

@@ -30,10 +30,12 @@ const appointmentSchema = mongoose.Schema(
 			type: String,
 			enum: ["finished", "ongoing", "queued"],
 		},
+
 	},
 	{
 		timestamps: true,
 	}
+	
 );
 
 export default mongoose.model("Appointment", appointmentSchema);
