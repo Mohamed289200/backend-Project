@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import userModel from "../models/userModel.js"; // Ensure the path and extension are correct
+import userModel from "../models/user.model.js"; // Ensure the path and extension are correct
 import jwt from "jsonwebtoken";
 import generateOTP from "../helpers/generateOTP.js";
 import sendEmail from "../Mail/mailingService.js";
@@ -7,9 +7,7 @@ export const register = async (req, res) => {
 	try {
 		const existingUser = await userModel.findOne({ email: req.body.email }); // Ensure you use req.body.email
 		if (existingUser) {
-			return res
-				.status(400)
-				.json({ message: "This email already exists" });
+			return res.status(400).json({ message: "This email already exists" });
 		}
 
 		const newUser = new userModel(req.body);
@@ -44,13 +42,12 @@ export const login = async (req, res) => {
 			(error, token) => {
 				if (error) {
 					console.error("Error signing token:", error);
-					return res
-						.status(500)
-						.json({ message: "Internal server error" });
+					return res.status(500).json({ message: "Internal server error" });
 				}
 
 				// Set the token in a cookie and respond
-				res.cookie("token", token, { httpOnly: true }) // Set httpOnly for security
+				res
+					.cookie("token", token, { httpOnly: true }) // Set httpOnly for security
 					.status(201)
 					.json({
 						_id: user._id,
