@@ -1,4 +1,4 @@
-import DiseasesCategory from "../models/models/diseasesCategory.model.js";
+import DiseasesCategory from "../models/diseasesCategory.model.js";
 import { errorHandler } from "../helpers/errorHandler.js";
 
 export const index = async (req, res, next) => {
@@ -24,13 +24,8 @@ export const index = async (req, res, next) => {
 };
 
 export const store = async (req, res, next) => {
-	const { diseasesID, name, description, rank } = req.body;
-	if (
-		diseasesID == null ||
-		name == null ||
-		description == null ||
-		rank == null
-	) {
+	const { name, description, rank } = req.body;
+	if (name == null || description == null || rank == null) {
 		return next(errorHandler(400, "All required fields must be provided."));
 	}
 	if (description.length > 400) {
@@ -43,7 +38,6 @@ export const store = async (req, res, next) => {
 	}
 	try {
 		const newDiesasesCategory = await new DiseasesCategory({
-			diseasesID,
 			name,
 			description,
 			rank,
@@ -105,7 +99,7 @@ export const destroy = async (req, res, next) => {
 		});
 		return res.status(204).json({
 			msg: "The DiseasesCategory has been successfully deleted",
-			success: false,
+			success: true,
 		});
 	} catch (error) {
 		return next(
