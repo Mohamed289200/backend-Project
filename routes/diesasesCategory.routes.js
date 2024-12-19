@@ -6,11 +6,11 @@ import {
 	destroy,
 } from "../controllers/diesasesCategory.controller.js";
 
-const router = express.Route();
+const router = express.Router();
 
 router.get("/diesasescategory", index);
 router.post("/diesasescategory", store);
-router.patch("/diesasescategory", update);
-router.delete("/diesasescategory", destroy);
+router.patch("/diesasescategory/:id", update);
+router.delete("/diesasescategory/:id", destroy);
 
 export default router;
