@@ -1,6 +1,6 @@
 import user from '../models/userModel.js';
 import Appointment from '../models/appointmentModel.js'
-import { populate } from 'dotenv';
+
 export const booking = async (req, res) => {
 
     try {
@@ -69,24 +69,47 @@ export const deleteAppointUser = async (req, res) => {
         res.status(403).json({ message: "You do not have permission to delete this appointment" });
     }
 }
-/**export const deleteAppointDoctor = async (req, res) => {
+export const deleteAppointDoctor = async (req, res) => {
     const role = req.user.role;
-    const doctorId = req.user.id;
-    if (role == "nurse" || role == "doctor") {
-        try {
+    const doctorId = req.user._id;
 
-            await Appointment.findByIdAndDelete(req.params.id)
-            res.json({ message: "book deleted", data: [] })
-        }
-        catch (error) {
+    if (role === "nurse" || role === "doctor") {
+        try {
+            const appointment = await Appointment.findById(req.params.id);
+            if (!appointment) {
+                return res.status(404).json({ message: "Appointment not found" });
+            }
+
+            // Delete the appointment
+            await Appointment.findByIdAndDelete(req.params.id);
+
+            // Remove the appointment from the doctor's record
+            await user.findByIdAndUpdate(
+                doctorId,
+                { $pull: { appointments: { appointmentId: appointment._id } } },
+                { new: true }
+            );
+
+            // Update the status of the appointment in the patient's record
+            await user.findByIdAndUpdate(
+                appointment.patientId,
+                { $set: { "appointments.$[elem].status": "deleted" } },
+                { arrayFilters: [{ "elem.appointmentId": appointment._id }], new: true }
+            );
+
+            res.json({ message: "Appointment deleted successfully", data: [] });
+        } catch (error) {
             console.error("Error deleting appointment:", error);
-            res.status(500).json({ message: "An error occurred while deleting the appointment", error: error.message });
+            res.status(500).json({
+                message: "An error occurred while deleting the appointment",
+                error: error.message,
+            });
         }
-    }
-    else {
+    } else {
         res.status(403).json({ message: "You do not have permission to delete this appointment" });
     }
-}*/
+};
+
 export const updateappointment = async (req, res) => {
     const role = req.user.role
     const userId = req.user._id
@@ -139,7 +162,7 @@ export const getAppointment = async (req, res) => {
         const booking = await Appointment.findById(id)
         res.status(200).json({ message: " successful", data: booking })
     } catch (error) {
-        res.status(400).json({ success: false, message: "deketed failed" })
+        res.status(400).json({ success: false, message: "failed" })
 
     }
 }
