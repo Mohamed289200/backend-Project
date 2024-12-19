@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import userRouter from "./routes/user.js";
 import adviceRouter from "./routes/advice.routes.js";
-import diesasesCategoryRouter from "./routes/diesasesCategory.routes.js";
+import diseasesCategoryRouter from "./routes/diseasesCategory.routes.js";
 // import User from "./models/userModel.js";
 // import Treatment from "./models/treatmentModel.js";
 // import Diseases from "./models/diseasesModel.js";
@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 //APIs goes here
 app.use("/", userRouter);
 app.use("/advice", adviceRouter);
-app.use("/diesasescategory", diesasesCategoryRouter);
+app.use("/diseasesscategory", diseasesCategoryRouter);
 // app.post("/test", async (req, res) => {
 // 	const { doctorId, patientId, nurseId, priority, appointmentDate, status } =
 // 		req.body;

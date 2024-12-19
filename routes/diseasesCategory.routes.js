@@ -4,7 +4,7 @@ import {
 	store,
 	update,
 	destroy,
-} from "../controllers/diesasesCategory.controller.js";
+} from "../controllers/diseasesCategory.controller.js";
 
 const router = express.Router();
 
