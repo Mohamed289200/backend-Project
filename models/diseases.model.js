@@ -16,6 +16,10 @@ const diseaseSchema = mongoose.Schema(
 			required: [true, "This Disease MUST have a rank"],
 			enum: ["critical", "severe", "moderate", "mild"],
 		},
+		diseasecategoryId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "DiseasesCategory",
+		},
 	},
 	{
 		timestamps: true,
