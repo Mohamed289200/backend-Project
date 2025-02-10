@@ -1,6 +1,6 @@
 
 import bcrypt from "bcrypt";
-import userModel from "../models/user.model.js"; // Ensure the path and extension are correct
+import userModel from "../models/userModel.js"; // Ensure the path and extension are correct
 import jwt from "jsonwebtoken";
 import generateOTP from "../helpers/generateOTP.js";
 import sendEmail from "../Mail/mailingService.js";

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import appointmentSchema from "./appointmentModel.js"
+
 const userSchema = mongoose.Schema(
 	{
 		name: {
