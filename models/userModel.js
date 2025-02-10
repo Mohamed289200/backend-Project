@@ -56,17 +56,16 @@ const userSchema = mongoose.Schema(
 		},
 		appointments: [
 			{
-				appointmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Appointment' },
-				status: { type: String, default: 'active' },
-				
-			}
-		]
-			  
-			 /*  {
-		   name: String,
-		   rating: Number,
-		 },*/
-		   
+				appointmentId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "Appointment",
+				},
+				status: { type: String, default: "active" },
+			},
+		],
+		otp: { type: String },
+		otpExpiry: { type: Date },
+		isVerified: { type: Boolean, default: false },
 	},
 	{
 		timestamps: true,
