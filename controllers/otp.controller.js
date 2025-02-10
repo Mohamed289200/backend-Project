@@ -1,8 +1,10 @@
-import userModel from "../models/userModel.js";
-import jwt from "jsonwebtoken";
-import { generateOTP, hashOTP } from "../helpers/OTP.helpers.js";
-import emailService from "../Mail/emailService.js";
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+import userModel from "../models/userModel.js";
+import { compareOTP, generateOTP, hashOTP } from "../helpers/OTP.helpers.js";
+import emailService from "../Mail/emailService.js";
 
 dotenv.config();
 
@@ -25,7 +27,7 @@ export const sendOTP = async (req, res) => {
 			});
 		}
 		const OTP = generateOTP();
-		const hashedOTP = hashOTP(OTP);
+		const hashedOTP = await hashOTP(OTP);
 		const OTPExpiry = new Date(Date.now() + 10 * 60000);
 
 		await userModel.findOneAndUpdate(

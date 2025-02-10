@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import userRouter from './routes/user.js';
+import otpRouter from './routes/otp.routes.js';
 import appointmentRouter from './routes/appointment.js'
 
 //import userRouter from "./routes/user.js";
@@ -32,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', userRouter);
 app.use('/', appointmentRouter);
 
-app.use("/", userRouter);
+app.use("/api/otp", otpRouter);
 app.use("/advice", adviceRouter);
 app.use("/diseasescategory", diseasesCategoryRouter);
 app.use("/diseases", diseasesRouter);
