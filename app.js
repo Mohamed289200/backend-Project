@@ -2,10 +2,9 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import helmet from "helmet";
 
-import userRouter from "./routes/user.js";
-import appointmentRouter from "./routes/appointment.js";
+import userRouter from './routes/user.js';
+import appointmentRouter from './routes/appointment.js'
 
 //import userRouter from "./routes/user.js";
 import adviceRouter from "./routes/advice.routes.js";
@@ -28,25 +27,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//setting security headers using helmet
-const helmet = require("helmet");
-
-app.use(
-	helmet.contentSecurityPolicy({
-		directives: {
-			defaultSrc: ["'self'"],
-			imgSrc: ["'self'", "data:"],
-			baseUri: ["'self'"],
-			objectSrc: ["'none'"],
-			upgradeInsecureRequests: [],
-		},
-	})
-);
-
 //APIs goes here
 
-app.use("/", userRouter);
-app.use("/", appointmentRouter);
+app.use('/', userRouter);
+app.use('/', appointmentRouter);
 
 app.use("/", userRouter);
 app.use("/advice", adviceRouter);
