@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/google", (req, res) => {
 	const redirectUri = `${process.env.BASE_URL}/auth/google/callback`;
-	const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=email profile`;
+	const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=email`;
 	res.redirect(authUrl);
 });
 
@@ -49,4 +49,9 @@ router.get("/google/callback", async (req, res, next) => {
 	}
 });
 
+app.get("/auth/facebook", (req, res) => {
+	const redirectUri = `${process.env.BASE_URL}/auth/facebook/callback`;
+	const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${process.env.FACEBOOK_APP_ID}&redirect_uri=${redirectUri}&response_type=code&scope=email`;
+	res.redirect(authUrl);
+});
 export default router;
