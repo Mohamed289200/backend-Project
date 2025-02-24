@@ -49,9 +49,39 @@ router.get("/google/callback", async (req, res, next) => {
 	}
 });
 
-app.get("/auth/facebook", (req, res) => {
+app.get("/facebook", (req, res) => {
 	const redirectUri = `${process.env.BASE_URL}/auth/facebook/callback`;
 	const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${process.env.FACEBOOK_APP_ID}&redirect_uri=${redirectUri}&response_type=code&scope=email`;
 	res.redirect(authUrl);
 });
+
+app.get("/facebook/callback", async (req, res) => {
+	const { code } = req.query;
+	const redirectUri = `${process.env.BASE_URL}/auth/facebook/callback`;
+	const tokenUrl = `https://graph.facebook.com/v18.0/oauth/access_token?client_id=${process.env.FACEBOOK_APP_ID}&client_secret=${process.env.FACEBOOK_APP_SECRET}&redirect_uri=${redirectUri}&code=${code}`;
+
+	try {
+		const { data } = await axios.get(tokenUrl);
+		const { access_token } = data;
+
+		const userInfoUrl = `https://graph.facebook.com/me?fields=email&access_token=${access_token}`;
+		const { data: userInfo } = await axios.get(userInfoUrl);
+
+		const { email } = userInfo;
+		const user = await User.findOne({ email }).lean();
+		if (!user) {
+			next(errorHandler(404, "the email doesn't exist in the database"));
+		}
+
+		const token = generateToken(user);
+		return res.redirect(`${process.env.CLIENT_URI}/home?token=${token}`);
+	} catch (error) {
+		console.error(
+			"Facebook auth error:",
+			error.response?.data || error.message
+		);
+		return next(errorHandler(500, error.message));
+	}
+});
+
 export default router;
