@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import { configDotenv } from "dotenv";
 import cors from "cors";
 import rateLimter from "express-rate-limit";
 import userRouter from "./routes/user.js";
@@ -12,15 +12,15 @@ import adviceRouter from "./routes/advice.routes.js";
 import diseasesCategoryRouter from "./routes/diseasesCategory.routes.js";
 import diseasesRouter from "./routes/diseases.routes.js";
 import treatmentRouter from "./routes/treatmnet.routes.js";
-
+import oauthRouter from "./routes/oauth.routes.js";
 // import User from "./models/userModel.js";
 // import Treatment from "./models/treatmentModel.js";
 // import Diseases from "./models/diseasesModel.js";
 // import DiseasesCategory from "./models/diseasesCategory.js";
 // import Advice from "./models/advice.js";
 // import Appointment from "./models/appointmentModel.js";
-dotenv.config();
 
+configDotenv();
 // starting the server
 const app = express();
 const Limter = rateLimter({
@@ -42,7 +42,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(Limter);
-app.use(helmet())
+app.use(helmet());
 //APIs goes here
 
 app.use("/", userRouter);
@@ -53,7 +53,7 @@ app.use("/advice", adviceRouter);
 app.use("/diseasescategory", diseasesCategoryRouter);
 app.use("/diseases", diseasesRouter);
 app.use("/treatment", treatmentRouter);
-
+app.use("/auth", oauthRouter);
 // app.post("/test", async (req, res) => {
 // 	const { doctorId, patientId, nurseId, priority, appointmentDate, status } =
 // 		req.body;
