@@ -1,6 +1,7 @@
 import express from "express";
 import User from "../models/userModel.js"
 import { errorHandler } from "../helpers/errorHandler.js";
+import { generateToken } from "../middlewares/auth.js";
 
 const router = express.Router();
 // Google OAuth Routes
