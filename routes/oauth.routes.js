@@ -2,6 +2,7 @@ import express from "express";
 import User from "../models/userModel.js";
 import { errorHandler } from "../helpers/errorHandler.js";
 import { generateToken } from "../middlewares/auth.js";
+import axios from "axios";
 
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.get("/google/callback", async (req, res, next) => {
 			next(errorHandler(404, "the email doesn't exist in the database"));
 		}
 
-		const token = generateToken(user);
+		const token = await generateToken(user);
 		return res.redirect(`${process.env.CLIENT_URI}/home?token=${token}`);
 	} catch (error) {
 		console.error(
@@ -55,7 +56,7 @@ router.get("/facebook", (req, res) => {
 	res.redirect(authUrl);
 });
 
-router.get("/facebook/callback", async (req, res) => {
+router.get("/facebook/callback", async (req, res, next) => {
 	const { code } = req.query;
 	const redirectUri = `${process.env.BASE_URL}/auth/facebook/callback`;
 	const tokenUrl = `https://graph.facebook.com/v18.0/oauth/access_token?client_id=${process.env.FACEBOOK_APP_ID}&client_secret=${process.env.FACEBOOK_APP_SECRET}&redirect_uri=${redirectUri}&code=${code}`;
@@ -64,16 +65,18 @@ router.get("/facebook/callback", async (req, res) => {
 		const { data } = await axios.get(tokenUrl);
 		const { access_token } = data;
 
-		const userInfoUrl = `https://graph.facebook.com/me?fields=email&access_token=${access_token}`;
+		const userInfoUrl = `https://graph.facebook.com/me?fields=id,name,email&access_token=${access_token}`;
 		const { data: userInfo } = await axios.get(userInfoUrl);
 
 		const { email } = userInfo;
+		console.log(email);
+		
 		const user = await User.findOne({ email }).lean();
 		if (!user) {
 			next(errorHandler(404, "the email doesn't exist in the database"));
 		}
 
-		const token = generateToken(user);
+		const token = await generateToken(user);
 		return res.redirect(`${process.env.CLIENT_URI}/home?token=${token}`);
 	} catch (error) {
 		console.error(
