@@ -1,7 +1,7 @@
 import user from "../models/userModel.js";
 import Appointment from "../models/appointmentModel.js";
 
-export const booking = async (req, res) => {
+export const store = async (req, res) => {
 	try {
 		const patientId = req.user._id;
 		// const doctorId = req.body.doctorId;
@@ -56,9 +56,7 @@ export const deleteAppointUser = async (req, res) => {
 		try {
 			const appointment = await Appointment.findById(req.params.id);
 			if (!appointment) {
-				return res
-					.status(404)
-					.json({ message: "Appointment not found" });
+				return res.status(404).json({ message: "Appointment not found" });
 			}
 
 			await Appointment.findByIdAndDelete(req.params.id);
@@ -85,13 +83,11 @@ export const deleteAppointDoctor = async (req, res) => {
 	const role = req.user.role;
 	const doctorId = req.user._id;
 
-	if (role === "nurse" || role === "doctor") {
+	if (role === "admin" || role === "nurse" || role === "doctor") {
 		try {
 			const appointment = await Appointment.findById(req.params.id);
 			if (!appointment) {
-				return res
-					.status(404)
-					.json({ message: "Appointment not found" });
+				return res.status(404).json({ message: "Appointment not found" });
 			}
 
 			// Delete the appointment
@@ -129,7 +125,7 @@ export const deleteAppointDoctor = async (req, res) => {
 	}
 };
 
-export const updateappointment = async (req, res) => {
+export const update = async (req, res) => {
 	const role = req.user.role;
 	const userId = req.user._id;
 	if (role == "patient") {
@@ -153,7 +149,7 @@ export const updateappointment = async (req, res) => {
 		res.status(403).send("Access Denied");
 	}
 };
-export const getAllAppointment = async (req, res) => {
+export const index = async (req, res) => {
 	const role = req.user.role;
 	if (role == "nurse" || role == "doctor") {
 		try {
@@ -170,7 +166,7 @@ export const getAllAppointment = async (req, res) => {
 		res.status(403).send("Access Denied");
 	}
 };
-export const getAppointment = async (req, res) => {
+export const show = async (req, res) => {
 	const id = req.params.id;
 	try {
 		const booking = await Appointment.findById(id);

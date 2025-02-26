@@ -55,13 +55,19 @@ export const store = async (req, res, next) => {
 			success: true,
 		});
 	} catch (error) {
-		return next(
-			errorHandler(
-				500,
-				"An error occurred while creating the Disease. Please try again later." +
-					error
-			)
-		);
+		if (error.code === 11000) {
+			return res.status(400).json({
+				msg: "Duplicate Disease is not Allowed",
+			});
+		} else {
+			return next(
+				errorHandler(
+					500,
+					"An error occurred while creating the Disease. Please try again later." +
+						error
+				)
+			);
+		}
 	}
 };
 
@@ -96,6 +102,10 @@ export const destroy = async (req, res, next) => {
 		return next(errorHandler(400, "All required fields must be provided."));
 	}
 	try {
+		const diseases = await DISEASES.findById(id);
+		if (!diseases) {
+			return res.status(404).json({ message: "Diseases not found" });
+		}
 		const result = await DISEASES.findOneAndDelete({ _id: id });
 		return res.status(204).json({
 			msg: "The Disease has been successfully deleted",
