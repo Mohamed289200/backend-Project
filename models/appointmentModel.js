@@ -28,14 +28,12 @@ const appointmentSchema = mongoose.Schema(
 		},
 		status: {
 			type: String,
-			enum: ["finished", "ongoing", "queued","deleted"],
+			enum: ["finished", "ongoing", "queued", "deleted"],
 		},
-
 	},
 	{
 		timestamps: true,
 	}
-	
 );
 
 export default mongoose.model("Appointment", appointmentSchema);

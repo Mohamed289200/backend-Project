@@ -36,26 +36,34 @@ export const store = async (req, res, next) => {
 			)
 		);
 	}
+
 	try {
-		const newTreatments = await TREATMENT({
+		const newTreatment = new TREATMENT({
 			diseaseID,
 			name,
 			description,
 		});
-		const result = await newTreatments.save();
+		const result = await newTreatment.save();
+
 		return res.status(201).json({
 			data: result,
 			msg: "New Treatment has been created successfully",
 			success: true,
 		});
 	} catch (error) {
-		return next(
-			errorHandler(
-				500,
-				"An error occurred while creating the Treatment. Please try again later." +
-					error
-			)
-		);
+		if (error.code === 11000) {
+			return res.status(400).json({
+				msg: "Duplicate treatment is not allowed! ",
+			});
+		} else {
+			return next(
+				errorHandler(
+					500,
+					"An error occurred while creating the Treatment. Please try again later." +
+						error
+				)
+			);
+		}
 	}
 };
 
@@ -90,6 +98,10 @@ export const destroy = async (req, res, next) => {
 		return next(errorHandler(400, "All required fields must be provided."));
 	}
 	try {
+		const treatment = await TREATMENT.findById(req.params.id);
+		if (!treatment) {
+			return res.status(404).json({ message: "Treatment not found" });
+		}
 		const result = await TREATMENT.findOneAndDelete({ _id: id });
 		return res.status(204).json({
 			msg: "The Treatment has been successfully deleted",

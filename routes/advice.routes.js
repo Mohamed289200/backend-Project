@@ -1,14 +1,15 @@
 import express from "express";
 import {
-	addAdvice,
-	deleteAdvice,
-	listAdvices,
-	updateAdvice,
+	index,
+	store,
+	update,
+	destroy,
 } from "../controllers/advice.controller.js";
+import authenticateJWT from "../middlewares/auth.js";
 const router = express.Router();
 
-router.get("/list", listAdvices);
-router.post("/addition", addAdvice);
-router.patch("/modification/:id", updateAdvice);
-router.delete("/deletion/:id", deleteAdvice);
+router.get("/", authenticateJWT, index);
+router.post("/", authenticateJWT, store);
+router.patch("/:id", authenticateJWT, update);
+router.delete("/:id", authenticateJWT, destroy);
 export default router;

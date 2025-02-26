@@ -5,12 +5,12 @@ import {
 	update,
 	destroy,
 } from "../controllers/diseases.controller.js";
-
+import authenticateJWT from "../middlewares/auth.js";
 const router = express.Router();
 
-router.get("/index", index);
-router.post("/store", store);
-router.patch("/update/:id", update);
-router.delete("/destroy/:id", destroy);
+router.get("/", authenticateJWT, index);
+router.post("/", authenticateJWT, store);
+router.patch("/:id", authenticateJWT, update);
+router.delete("/:id", authenticateJWT, destroy);
 
 export default router;

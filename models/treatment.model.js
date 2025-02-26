@@ -10,6 +10,7 @@ const treatmentSchema = mongoose.Schema(
 		name: {
 			type: String,
 			required: [true, "This Treatment MUST have a name"],
+			unique: true,
 		},
 		description: {
 			type: String,

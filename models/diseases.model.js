@@ -5,6 +5,7 @@ const diseaseSchema = mongoose.Schema(
 		name: {
 			type: String,
 			required: [true, "This Disease MUST have a name"],
+			unique: true,
 		},
 		description: {
 			type: String,

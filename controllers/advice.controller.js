@@ -1,7 +1,7 @@
 import ADVICE from "../models/advice.model.js";
 import { errorHandler } from "../helpers/errorHandler.js";
 
-export const listAdvices = async (req, res, next) => {
+export const index = async (req, res, next) => {
 	try {
 		const adviceList = await ADVICE.find();
 		if (adviceList == null) {
@@ -17,7 +17,7 @@ export const listAdvices = async (req, res, next) => {
 	}
 };
 
-export const addAdvice = async (req, res, next) => {
+export const store = async (req, res, next) => {
 	const { doctorId, diseasesCategoryId, description } = req.body;
 	if (doctorId == null || diseasesCategoryId == null || description == null) {
 		return next(errorHandler(400, "Please provide all required fields"));
@@ -38,13 +38,11 @@ export const addAdvice = async (req, res, next) => {
 			success: true,
 		});
 	} catch (error) {
-		return next(
-			errorHandler(500, "Error while inserting the advice:" + error)
-		);
+		return next(errorHandler(500, "Error while inserting the advice:" + error));
 	}
 };
 
-export const updateAdvice = async (req, res, next) => {
+export const update = async (req, res, next) => {
 	const { id } = req.params;
 	if (id == null) {
 		return next(errorHandler(400, "please provide the ID of the advice"));
@@ -59,26 +57,26 @@ export const updateAdvice = async (req, res, next) => {
 			success: true,
 		});
 	} catch (error) {
-		return next(
-			errorHandler(500, "Error while updating the advice:" + error)
-		);
+		return next(errorHandler(500, "Error while updating the advice:" + error));
 	}
 };
 
-export const deleteAdvice = async (req, res, next) => {
+export const destroy = async (req, res, next) => {
 	const { id } = req.params;
-	if (id == null) {
-		return next(errorHandler(400, "please provide the ID of the advice"));
-	}
 	try {
+		const advice = await ADVICE.findById(id);
+		if (!advice) {
+			return res.status(404).json({ message: "Advice not found" });
+		}
+		if (id == null) {
+			return next(errorHandler(400, "Please provide the ID of the advice"));
+		}
 		const result = await ADVICE.findOneAndDelete({ _id: id });
 		return res.status(200).json({
 			success: true,
 			message: "deleted successfully",
 		});
 	} catch (error) {
-		return next(
-			errorHandler(500, "Error while deleting the advice:" + error)
-		);
+		return next(errorHandler(500, "Error while deleting the advice:" + error));
 	}
 };

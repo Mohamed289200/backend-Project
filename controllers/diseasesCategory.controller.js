@@ -49,13 +49,19 @@ export const store = async (req, res, next) => {
 			success: true,
 		});
 	} catch (error) {
-		return next(
-			errorHandler(
-				500,
-				"An error occurred while creating the DiseasesCategories. Please try again later." +
-					error
-			)
-		);
+		if (error.code === 11000) {
+			return res.status(400).json({
+				msg: "Duplicate Disease Category is not Allowed",
+			});
+		} else {
+			return next(
+				errorHandler(
+					500,
+					"An error occurred while creating the DiseasesCategories. Please try again later." +
+						error
+				)
+			);
+		}
 	}
 };
 
@@ -94,7 +100,11 @@ export const destroy = async (req, res, next) => {
 		return next(errorHandler(400, "All required fields must be provided."));
 	}
 	try {
-		const diesasescategory = await DiseasesCategory.findOneAndDelete({
+		const diseasesCategories = await DiseasesCategory.findById(id);
+		if (!diseasesCategories) {
+			return res.status(404).json({ message: "DiseasesCategories not found" });
+		}
+		diesasescategory = await DiseasesCategory.findOneAndDelete({
 			_id: id,
 		});
 		return res.status(204).json({
