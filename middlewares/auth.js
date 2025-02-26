@@ -18,4 +18,12 @@ const authenticateJWT = (req, res, next) => {
 	});
 };
 
+export const generateToken = async (user) => {
+	const token = jwt.sign(
+		{ _id: user._id, name: user.name, role: user.role },
+		process.env.JWT_SECRET,
+		{ expiresIn: "1h" }
+	);
+	return token;
+};
 export default authenticateJWT;
