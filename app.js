@@ -38,7 +38,7 @@ const Limter = rateLimter({
 // 	})
 // );
 
-app.use(cors());
+app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(Limter);
@@ -80,6 +80,13 @@ app.use("/auth", oauthRouter);
 // 		});
 // 	}
 // });
+
+app.get("*", (req, res) => {
+	return res.status(404).json({
+		Message: "Looks like You got lost",
+	});
+});
+
 //Error handler route
 app.use((err, req, res, next) => {
 	const statusCode = err.statusCode || 500;
@@ -102,5 +109,5 @@ mongoose
 		});
 	})
 	.catch((error) => {
-		console.log("Connection Failed" + " >>  " + error);
+		console.log("Connection Failed" + " >>  " + error.message);
 	});
