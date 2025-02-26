@@ -2,13 +2,10 @@ import mongoose from "mongoose";
 
 const diseasesCategorySchema = mongoose.Schema(
 	{
-		// diseasesID: {
-		// 	type: mongoose.Schema.Types.ObjectId,
-		// 	ref: "Diseases",
-		// },
 		name: {
 			type: String,
 			required: [true, "This Disease Category MUST have a name"],
+			unique: true,
 		},
 		description: {
 			type: String,
