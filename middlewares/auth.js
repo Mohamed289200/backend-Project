@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-
+import { isTokenInBlacklist } from "../controllers/blacklist.js";
 const authenticateJWT = (req, res, next) => {
 	const fullToken = req.headers.authorization;
 	if (!fullToken) {
@@ -8,6 +8,11 @@ const authenticateJWT = (req, res, next) => {
 	const token = fullToken.split(" ")[1];
 	if (!token) {
 		return res.status(403).json({ message: "Access denied" });
+	}
+	if (isTokenInBlacklist(token)) {
+		return res
+			.status(401)
+			.json({ message: "Token is invalid, please log in again" });
 	}
 	jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
 		if (err) {
