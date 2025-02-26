@@ -80,6 +80,11 @@ app.use("/auth", oauthRouter);
 // 		});
 // 	}
 // });
+
+app.get("*", (req, res) => {
+	return res.status(404).send("Looks like You got LOST");
+});
+
 //Error handler route
 app.use((err, req, res, next) => {
 	const statusCode = err.statusCode || 500;
