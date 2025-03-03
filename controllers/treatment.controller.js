@@ -4,7 +4,7 @@ import { errorHandler } from "../helpers/errorHandler.js";
 export const index = async (req, res, next) => {
 	try {
 		const Treatments = await TREATMENT.find();
-		if (Treatments == null) {
+		if (Treatments.length === 0) {
 			return next(errorHandler(204, "There aren't any Treatments"));
 		}
 		return res.status(200).json({

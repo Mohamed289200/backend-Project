@@ -48,7 +48,7 @@ app.use(helmet());
 app.use(helmet());
 //APIs goes here
 
-app.use("/api", userRouter);
+app.use("/api/user", userRouter);
 
 app.use("/api/advice", adviceRouter);
 app.use("/api/appointment", appointmentRouter);
