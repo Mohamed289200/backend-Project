@@ -17,7 +17,7 @@ export const store = async (req, res) => {
 				doctorId,
 				priority,
 				appointmentDate,
-				name: patient.name, 
+				name: patient.name,
 			});
 			const savedAppointment = await appoint.save();
 			const doctor = await user.findById(doctorId);
@@ -29,12 +29,12 @@ export const store = async (req, res) => {
 					.json({ success: false, message: "Tour not found" });
 			}
 			await doctor.updateOne({
-				$addToSet :{appointments:{$each:[savedAppointment]}}
+				$addToSet: { appointments: { $each: [savedAppointment] } },
 				//$push: { appointments: savedAppointment._id },
 			});
 			await user.findByIdAndUpdate(
 				{ _id: userId },
-				{  $addToSet :{appointments:{$each:[savedAppointment]}} }
+				{ $addToSet: { appointments: { $each: [savedAppointment] } } }
 			);
 
 			res.status(200).json({
@@ -157,7 +157,14 @@ export const index = async (req, res) => {
 	if (role == "nurse" || role == "doctor") {
 		try {
 			const appointments = await Appointment.find();
-			res.json({ message: "Appointments", data: appointments });
+			if (appointments.length === 0) {
+				return next(errorHandler(204, "There aren't any Appointment"));
+			}
+			res.json({
+				message: "Appointments",
+				data: appointments,
+				success: true,
+			});
 		} catch (error) {
 			console.error("Error updating appointment:", error);
 			res.status(500).json({

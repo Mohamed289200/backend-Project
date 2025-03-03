@@ -8,7 +8,7 @@ import {
 import authenticateJWT from "../middlewares/auth.js";
 const router = express.Router();
 
-router.get("/", authenticateJWT, index);
+router.get("/", index);
 router.post("/", authenticateJWT, store);
 router.patch("/:id", authenticateJWT, update);
 router.delete("/:id", authenticateJWT, destroy);
