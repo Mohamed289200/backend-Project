@@ -4,7 +4,7 @@ import { errorHandler } from "../helpers/errorHandler.js";
 export const index = async (req, res, next) => {
 	try {
 		const adviceList = await ADVICE.find();
-		if (adviceList == null) {
+		if (adviceList.length === 0) {
 			return next(errorHandler(200, "Advice list is empty"));
 		}
 		return res.status(200).json({

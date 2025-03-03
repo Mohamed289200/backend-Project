@@ -77,8 +77,8 @@ export const logout = async (req, res) => {
 export const index = async (req, res, next) => {
 	try {
 		const users = await userModel.find();
-		if (!users) {
-			return next(errorHandler(204, "There are no users "));
+		if (users.length === 0) {
+			return next(errorHandler(404, "There are no users "));
 		}
 		return res.status(200).json({
 			data: users,
@@ -89,8 +89,7 @@ export const index = async (req, res, next) => {
 		return next(
 			errorHandler(
 				500,
-				"There is an error occured when retrieving the user data,Please try again later " +
-					error
+				`There is an error occured when retrieving the user data,Please try again later ${error}`
 			)
 		);
 	}
