@@ -177,21 +177,34 @@ export const update = async (req, res) => {
 	const role = req.user.role;
 	const userId = req.user._id;
 	if (role == "patient") {
+		const session = await startSession();
 		try {
+			session.startTransaction();
+
 			const appointmentId = req.params.id;
 			const newAppointment = req.body;
-			await Appointment.findByIdAndUpdate(appointmentId, newAppointment);
+			await Appointment.findByIdAndUpdate(
+				appointmentId,
+				newAppointment
+			).session(session);
 			await user.findByIdAndUpdate(
 				userId,
-				{ $addToSet: { appointments: newAppointment._id } } // Use $addToSet to avoid duplicates
+				{ $addToSet: { appointments: newAppointment._id } }, // Use $addToSet to avoid duplicates
+				{ session }
 			);
+
+			await session.commitTransaction();
 			res.json({ message: "book update", data: newAppointment });
 		} catch (error) {
+			await session.abortTransaction();
+
 			console.error("Error updating appointment:", error);
 			res.status(500).json({
 				message: "An error occurred while updating the appointment",
 				error: error.message,
 			});
+		} finally {
+			await session.endSession();
 		}
 	} else {
 		res.status(403).send("Access Denied");
