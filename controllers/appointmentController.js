@@ -67,11 +67,11 @@ export const store = async (req, res) => {
 	}
 };
 export const deleteAppointUser = async (req, res) => {
-	const session = await startSession();
-
 	const role = req.user.role;
 	const userId = req.user._id;
+
 	if (role == "admin" || role == "patient") {
+		const session = await startSession();
 		try {
 			session.startTransaction();
 
@@ -107,7 +107,6 @@ export const deleteAppointUser = async (req, res) => {
 			await session.endSession();
 		}
 	} else {
-		await session.endSession();
 		res.status(403).json({
 			message: "You do not have permission to delete this appointment",
 		});
@@ -116,24 +115,32 @@ export const deleteAppointUser = async (req, res) => {
 export const deleteAppointDoctor = async (req, res) => {
 	const role = req.user.role;
 	const doctorId = req.user._id;
-
 	if (role === "admin" || role === "nurse" || role === "doctor") {
+		const session = await startSession();
 		try {
-			const appointment = await Appointment.findById(req.params.id);
+			session.startTransaction();
+
+			const appointment = await Appointment.findById(
+				req.params.id
+			).session(session);
+
 			if (!appointment) {
+				await session.abortTransaction();
+				await session.endSession();
+
 				return res
 					.status(404)
 					.json({ message: "Appointment not found" });
 			}
 
 			// Delete the appointment
-			await Appointment.findByIdAndDelete(req.params.id);
+			await Appointment.findByIdAndDelete(req.params.id).session(session);
 
 			// Remove the appointment from the doctor's record
 			await user.findByIdAndUpdate(
 				doctorId,
 				{ $pull: { appointments: { appointmentId: appointment._id } } },
-				{ new: true }
+				{ new: true, session }
 			);
 
 			// Update the status of the appointment in the patient's record
@@ -143,16 +150,21 @@ export const deleteAppointDoctor = async (req, res) => {
 				{
 					arrayFilters: [{ "elem.appointmentId": appointment._id }],
 					new: true,
+					session,
 				}
 			);
 
+			await session.commitTransaction();
 			res.json({ message: "Appointment deleted successfully", data: [] });
 		} catch (error) {
+			await session.abortTransaction();
 			console.error("Error deleting appointment:", error);
 			res.status(500).json({
 				message: "An error occurred while deleting the appointment",
 				error: error.message,
 			});
+		} finally {
+			await session.endSession();
 		}
 	} else {
 		res.status(403).json({
