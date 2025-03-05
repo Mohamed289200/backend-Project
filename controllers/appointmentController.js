@@ -67,32 +67,47 @@ export const store = async (req, res) => {
 	}
 };
 export const deleteAppointUser = async (req, res) => {
+	const session = await startSession();
+
 	const role = req.user.role;
 	const userId = req.user._id;
 	if (role == "admin" || role == "patient") {
 		try {
-			const appointment = await Appointment.findById(req.params.id);
+			session.startTransaction();
+
+			const appointment = await Appointment.findById(
+				req.params.id
+			).session(session);
 			if (!appointment) {
+				await session.abortTransaction();
+				await session.endSession();
+
 				return res
 					.status(404)
 					.json({ message: "Appointment not found" });
 			}
 
-			await Appointment.findByIdAndDelete(req.params.id);
+			await Appointment.findByIdAndDelete(req.params.id).session(session);
 			await user.findByIdAndUpdate(
 				{ _id: userId },
 				{ $pull: { appointments: appointment } },
-				{ new: true }
+				{ new: true, session }
 			);
+
+			await session.commitTransaction();
 			res.json({ message: "book deleted", data: [] });
 		} catch (error) {
+			await session.abortTransaction();
 			console.error("Error deleting appointment:", error);
 			res.status(500).json({
 				message: "An error occurred while deleting the appointment",
 				error: error.message,
 			});
+		} finally {
+			await session.endSession();
 		}
 	} else {
+		await session.endSession();
 		res.status(403).json({
 			message: "You do not have permission to delete this appointment",
 		});
