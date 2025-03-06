@@ -45,7 +45,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(Limter);
 app.use(helmet());
-app.use(helmet());
 //APIs goes here
 
 app.use("/api/user", userRouter);
