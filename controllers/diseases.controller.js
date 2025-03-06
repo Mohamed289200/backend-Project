@@ -74,7 +74,7 @@ export const store = async (req, res, next) => {
 export const update = async (req, res, next) => {
 	const { id } = req.params;
 	if (id == null) {
-		return next(errorHandler(400, "All required fields must be provided."));
+		return next(errorHandler(400, "The 'id' parameter is required."));
 	}
 	try {
 		const result = await DISEASES.findOneAndUpdate({ _id: id }, req.body, {
@@ -99,7 +99,7 @@ export const update = async (req, res, next) => {
 export const destroy = async (req, res, next) => {
 	const { id } = req.params;
 	if (id == null) {
-		return next(errorHandler(400, "All required fields must be provided."));
+		return next(errorHandler(400, "The 'id' parameter is required."));
 	}
 	try {
 		const diseases = await DISEASES.findById(id);
