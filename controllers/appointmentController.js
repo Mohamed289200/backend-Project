@@ -1,10 +1,14 @@
 import user from "../models/userModel.js";
 import Appointment from "../models/appointmentModel.js";
+import { startSession } from "mongoose";
 
 export const store = async (req, res) => {
+	const session = await startSession();
 	try {
+		session.startTransaction();
+
 		const patientId = req.user._id;
-		const patient = await user.findById(patientId);
+		const patient = await user.findById(patientId).session(session);
 		// const doctorId = req.body.doctorId;
 		const doctorId = req.params.id;
 		const role = req.user.role;
@@ -19,62 +23,88 @@ export const store = async (req, res) => {
 				appointmentDate,
 				name: patient.name,
 			});
-			const savedAppointment = await appoint.save();
-			const doctor = await user.findById(doctorId);
+			const savedAppointment = await appoint.save({ session });
+			const doctor = await user.findById(doctorId).session(session);
 			const userId = appoint.patientId;
 			if (!doctor) {
+				await session.abortTransaction();
 				console.error(`doctor not found with id ${doctorId}`);
 				return res
 					.status(404)
-					.json({ success: false, message: "Tour not found" });
+					.json({ success: false, message: "Doctor not found." });
 			}
-			await doctor.updateOne({
-				$addToSet: { appointments: { $each: [savedAppointment] } },
-				//$push: { appointments: savedAppointment._id },
-			});
+			await doctor.updateOne(
+				{
+					$addToSet: { appointments: { $each: [savedAppointment] } },
+					//$push: { appointments: savedAppointment._id },
+				},
+				{ session }
+			);
 			await user.findByIdAndUpdate(
 				{ _id: userId },
-				{ $addToSet: { appointments: { $each: [savedAppointment] } } }
+				{ $addToSet: { appointments: { $each: [savedAppointment] } } },
+				{ session }
 			);
 
+			await session.commitTransaction();
 			res.status(200).json({
 				message: "Appointment booked successfully",
 				appointment: savedAppointment,
 			});
 		} else {
+			await session.abortTransaction();
 			res.status(403).send("Access Denied");
 		}
 	} catch (error) {
+		await session.abortTransaction();
 		console.error("Error booking appointment:", error);
 		res.status(400).send({
 			message: "An error occurred while booking the appointment",
 			error: error.message,
 		});
+	} finally {
+		await session.endSession();
 	}
 };
 export const deleteAppointUser = async (req, res) => {
 	const role = req.user.role;
 	const userId = req.user._id;
+
 	if (role == "admin" || role == "patient") {
+		const session = await startSession();
 		try {
-			const appointment = await Appointment.findById(req.params.id);
+			session.startTransaction();
+
+			const appointment = await Appointment.findById(
+				req.params.id
+			).session(session);
 			if (!appointment) {
-				return res.status(404).json({ message: "Appointment not found" });
+				await session.abortTransaction();
+				await session.endSession();
+
+				return res
+					.status(404)
+					.json({ message: "Appointment not found" });
 			}
 
-			await Appointment.findByIdAndDelete(req.params.id);
+			await Appointment.findByIdAndDelete(req.params.id).session(session);
 			await user.findByIdAndUpdate(
 				{ _id: userId },
 				{ $pull: { appointments: appointment } },
-				{ new: true }
+				{ new: true, session }
 			);
+
+			await session.commitTransaction();
 			res.json({ message: "book deleted", data: [] });
 		} catch (error) {
+			await session.abortTransaction();
 			console.error("Error deleting appointment:", error);
 			res.status(500).json({
 				message: "An error occurred while deleting the appointment",
 				error: error.message,
 			});
+		} finally {
+			await session.endSession();
 		}
 	} else {
 		res.status(403).json({
@@ -85,22 +115,32 @@ export const deleteAppointUser = async (req, res) => {
 export const deleteAppointDoctor = async (req, res) => {
 	const role = req.user.role;
 	const doctorId = req.user._id;
-
 	if (role === "admin" || role === "nurse" || role === "doctor") {
+		const session = await startSession();
 		try {
-			const appointment = await Appointment.findById(req.params.id);
+			session.startTransaction();
+
+			const appointment = await Appointment.findById(
+				req.params.id
+			).session(session);
+
 			if (!appointment) {
-				return res.status(404).json({ message: "Appointment not found" });
+				await session.abortTransaction();
+				await session.endSession();
+
+				return res
+					.status(404)
+					.json({ message: "Appointment not found" });
 			}
 
 			// Delete the appointment
-			await Appointment.findByIdAndDelete(req.params.id);
+			await Appointment.findByIdAndDelete(req.params.id).session(session);
 
 			// Remove the appointment from the doctor's record
 			await user.findByIdAndUpdate(
 				doctorId,
 				{ $pull: { appointments: { appointmentId: appointment._id } } },
-				{ new: true }
+				{ new: true, session }
 			);
 
 			// Update the status of the appointment in the patient's record
@@ -110,16 +150,21 @@ export const deleteAppointDoctor = async (req, res) => {
 				{
 					arrayFilters: [{ "elem.appointmentId": appointment._id }],
 					new: true,
+					session,
 				}
 			);
 
+			await session.commitTransaction();
 			res.json({ message: "Appointment deleted successfully", data: [] });
 		} catch (error) {
+			await session.abortTransaction();
 			console.error("Error deleting appointment:", error);
 			res.status(500).json({
 				message: "An error occurred while deleting the appointment",
 				error: error.message,
 			});
+		} finally {
+			await session.endSession();
 		}
 	} else {
 		res.status(403).json({
@@ -132,21 +177,34 @@ export const update = async (req, res) => {
 	const role = req.user.role;
 	const userId = req.user._id;
 	if (role == "patient") {
+		const session = await startSession();
 		try {
+			session.startTransaction();
+
 			const appointmentId = req.params.id;
 			const newAppointment = req.body;
-			await Appointment.findByIdAndUpdate(appointmentId, newAppointment);
+			await Appointment.findByIdAndUpdate(
+				appointmentId,
+				newAppointment
+			).session(session);
 			await user.findByIdAndUpdate(
 				userId,
-				{ $addToSet: { appointments: newAppointment._id } } // Use $addToSet to avoid duplicates
+				{ $addToSet: { appointments: newAppointment._id } }, // Use $addToSet to avoid duplicates
+				{ session }
 			);
+
+			await session.commitTransaction();
 			res.json({ message: "book update", data: newAppointment });
 		} catch (error) {
+			await session.abortTransaction();
+
 			console.error("Error updating appointment:", error);
 			res.status(500).json({
 				message: "An error occurred while updating the appointment",
 				error: error.message,
 			});
+		} finally {
+			await session.endSession();
 		}
 	} else {
 		res.status(403).send("Access Denied");

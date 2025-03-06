@@ -3,7 +3,7 @@ import { errorHandler } from "../helpers/errorHandler.js";
 
 export const index = async (req, res, next) => {
 	try {
-		const adviceList = await ADVICE.find();
+		const adviceList = await ADVICE.find().lean();
 		if (adviceList.length === 0) {
 			return next(errorHandler(200, "Advice list is empty"));
 		}
@@ -50,33 +50,29 @@ export const update = async (req, res, next) => {
 	try {
 		const result = await ADVICE.findOneAndUpdate({ _id: id }, req.body, {
 			new: true,
-		});
+		}).lean();
 		return res.status(200).json({
 			data: result,
 			message: "successfully updated",
 			success: true,
 		});
 	} catch (error) {
-		return next(errorHandler(500, "Error while updating the advice:" + error));
+		return next(errorHandler(500, "Error while updating the advice:" + error.message));
 	}
 };
 
 export const destroy = async (req, res, next) => {
 	const { id } = req.params;
 	try {
-		const advice = await ADVICE.findById(id);
-		if (!advice) {
-			return res.status(404).json({ message: "Advice not found" });
-		}
 		if (id == null) {
 			return next(errorHandler(400, "Please provide the ID of the advice"));
 		}
-		const result = await ADVICE.findOneAndDelete({ _id: id });
+		await ADVICE.findOneAndDelete({ _id: id });
 		return res.status(200).json({
 			success: true,
 			message: "deleted successfully",
 		});
 	} catch (error) {
-		return next(errorHandler(500, "Error while deleting the advice:" + error));
+		return next(errorHandler(500, "Error while deleting the advice:" + error.message));
 	}
 };
