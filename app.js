@@ -25,11 +25,11 @@ dotenv.config();
 configDotenv();
 // starting the server
 const app = express();
-const Limter = rateLimter({
-	windowMs: 1000 * 60 * 15,
-	max: 20,
-	message: "Too many requests ,try again later",
-});
+// const Limter = rateLimter({
+// 	windowMs: 1000 * 60 * 15,
+// 	max: 20,
+// 	message: "Too many requests ,try again later",
+// });
 
 // app.use(
 // 	cors({
