@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
    "test": "jest",
+    "devDependencies": {
+    "jest": "^29.0.0"
+  }
     "start": "node app.js",
     "dev": "nodemon app.js",
     "build": "npm install"
